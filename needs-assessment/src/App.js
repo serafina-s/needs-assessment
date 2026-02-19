@@ -21,10 +21,11 @@ const LITERACY_LEVELS = [
 ];
 
 const LIFECYCLE_OPTIONS = [
-  { val: "pre_enroll", label: "Primarily before students arrive — recruitment, admission, or early engagement" },
+  { val: "pre_college", label: "Before students apply — working with middle and high school students (grades 7–12) who may one day enroll at RU-N" },
+  { val: "pre_enroll", label: "During the application and admission process — recruitment, admission, or early engagement with prospective students" },
   { val: "transition", label: "At key transition points — deposit, orientation, first registration" },
-  { val: "year_round", label: "Year-round — ongoing support that directly affects whether students stay" },
-  { val: "return", label: "At re-enrollment — when students decide whether to come back" },
+  { val: "year_round", label: "Year-round — ongoing support that directly affects whether students stay enrolled" },
+  { val: "return", label: "At re-enrollment — when students decide whether to come back each term" },
   { val: "all", label: "All of the above — our work touches students at multiple lifecycle stages" },
 ];
 
@@ -101,7 +102,7 @@ function FormView({ onSubmitSuccess }) {
       <div className="intro-card">
         <div className="tag">ENROLLMENT MANAGEMENT · DATA & ANALYTICS</div>
         <h1 className="display-title">Before We Meet</h1>
-        <p className="display-sub">A thought starter from your Associate Director of Analytics</p>
+        <p className="display-sub">A thought starter from your Director of Data Analytics</p>
         <div className="rule" />
         <p className="prose">I'm meeting with each director across the division to understand how your team uses data today and where analytics support can make the biggest difference for you. Your answers here shape our conversation — no prep, no reports to pull, just your honest perspective.</p>
         <p className="prose">This takes <strong>6–8 minutes</strong> and covers seven areas. Your responses are shared only with me and used only to prepare for our one-on-one.</p>
@@ -119,7 +120,7 @@ function FormView({ onSubmitSuccess }) {
         <div className="form-header">
           <div className="tag">ENROLLMENT MANAGEMENT · DATA NEEDS ASSESSMENT</div>
           <h2 className="form-title">Pre-Meeting Thought Starter</h2>
-          <p className="form-sub">Responses are shared only with the Associate Director of Analytics to prepare for your conversation.</p>
+          <p className="form-sub">Responses are shared only with the Director of Data Analytics to prepare for your conversation.</p>
         </div>
 
         {/* Who you are */}
@@ -145,7 +146,7 @@ function FormView({ onSubmitSuccess }) {
           <div className="q-num">01</div>
           <label className="q-text">What reports or data does your team currently rely on — and what does a typical reporting week or month look like for you?</label>
           <p className="q-hint">Include the systems you pull from, how often, and who the reports are for. Don't worry about being exhaustive — just describe what's most central to your work.</p>
-          <textarea className="textarea" rows={4} placeholder="e.g. We pull weekly enrollment reports from Banner and share them with our director on Mondays. Most of it is manual — exported to Excel and formatted by hand…" value={form.reportingReality} onChange={e => update("reportingReality", e.target.value)} />
+          <textarea className="textarea" rows={4} placeholder="e.g. We pull weekly enrollment reports from Salesforce and share them with our director on Mondays. Most of it is manual — exported to Excel and formatted by hand…" value={form.reportingReality} onChange={e => update("reportingReality", e.target.value)} />
           <label className="field-label" style={{marginTop: 16}}>Are there reports your team produces that you're not sure anyone actually uses?</label>
           <input className="input" placeholder="Optional — describe if relevant" value={form.unusedReports} onChange={e => update("unusedReports", e.target.value)} />
         </div>
@@ -270,7 +271,7 @@ function ThankYouView({ name, unit }) {
         <p className="display-sub">{unit} · Response received</p>
         <div className="rule" />
         <p className="prose">Your answers have been saved and I'll review them before we meet. Looking forward to our conversation. If anything else comes to mind in the meantime, reach out directly.</p>
-        <p className="prose" style={{color:"#CC0033",fontWeight:600}}>— Associate Director of Analytics, Enrollment Management</p>
+        <p className="prose" style={{color:"#CC0033",fontWeight:600}}>— Director of Data Analytics, Enrollment Management</p>
       </div>
     </div>
   );
@@ -473,9 +474,9 @@ const css = `
   .section-optional { background: #FAFAF8; }
   .section-label { font-size: 10px; letter-spacing: 2px; font-weight: 600; color: #CC0033; text-transform: uppercase; margin-bottom: 20px; font-family: 'DM Sans', sans-serif; }
   .optional-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; font-weight: 600; color: #888; text-transform: uppercase; border: 1px solid #DDD; border-radius: 2px; padding: 3px 8px; margin-bottom: 16px; font-family: 'DM Sans', sans-serif; }
-  .q-num { font-family: 'DM Serif Display', serif; font-size: 48px; color: #F0EBE5; position: absolute; top: 16px; right: 28px; line-height: 1; user-select: none; }
+  .q-num { font-family: 'DM Serif Display', serif; font-size: 64px; color: #F0EBE5; position: absolute; bottom: 12px; right: 20px; line-height: 1; user-select: none; pointer-events: none; }
   .lifecycle-num { color: #E8D5F5; }
-  .q-text { display: block; font-size: 15px; color: #1A1A1A; line-height: 1.6; font-weight: 500; margin-bottom: 8px; font-family: 'DM Sans', sans-serif; }
+  .q-text { display: block; font-size: 15px; color: #1A1A1A; line-height: 1.6; font-weight: 500; margin-bottom: 8px; font-family: 'DM Sans', sans-serif; padding-right: 48px; }
   .q-hint { font-size: 12.5px; color: #999; line-height: 1.5; margin-bottom: 16px; font-style: italic; font-family: 'DM Sans', sans-serif; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .field { display: flex; flex-direction: column; }
