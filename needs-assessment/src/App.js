@@ -277,6 +277,185 @@ function ThankYouView({ name, unit }) {
   );
 }
 
+
+// ─── ANALYTICS DASHBOARD ─────────────────────────────────────────────────────
+
+function AnalyticsDashboard({ responses }) {
+  const confColor = n => n <= 2 ? '#CC0033' : n === 3 ? '#E07800' : '#1A7A3C';
+  const confBg    = n => n <= 2 ? '#FFF0F2' : n === 3 ? '#FFF8F0' : '#F0FAF4';
+
+  // ── Confidence by unit ──────────────────────────────────────────────
+  const confByUnit = UNITS.map(u => {
+    const r = responses.find(x => x.unit === u);
+    return { unit: u, score: r?.confidence || null };
+  });
+  const maxConf = 5;
+
+  // ── Literacy distribution ───────────────────────────────────────────
+  const litCounts = [1,2,3,4,5].map(l => ({
+    level: l,
+    units: responses.filter(r => String(r.literacy_level) === String(l)).map(r => r.unit),
+  }));
+  const litColors = ['#CC0033','#E07800','#E8B84B','#1565A0','#1A7A3C'];
+  const litLabels = ['Needs support','Can read reports','Functional','Confident','Advanced'];
+
+  // ── Lifecycle overlap ───────────────────────────────────────────────
+  const lifecycleShort = [
+    { val:'pre_college', label:'Pre-College' },
+    { val:'pre_enroll',  label:'Application' },
+    { val:'transition',  label:'Transitions' },
+    { val:'year_round',  label:'Year-Round'  },
+    { val:'return',      label:'Re-Enroll'   },
+  ];
+  const lifecycleCounts = lifecycleShort.map(o => ({
+    ...o,
+    units: responses.filter(r => Array.isArray(r.lifecycle_role) && r.lifecycle_role.includes(o.val)).map(r => r.unit),
+  }));
+
+  // ── Cross-unit signals ──────────────────────────────────────────────
+  const signals = [
+    { label:'Low data trust (1–2)',       units: responses.filter(r=>r.confidence<=2 && r.confidence>0).map(r=>r.unit),                                       color:'#CC0033', bg:'#FFF0F2' },
+    { label:'Low literacy (L1–2)',         units: responses.filter(r=>['1','2'].includes(String(r.literacy_level))).map(r=>r.unit),                             color:'#E07800', bg:'#FFF8F0' },
+    { label:'Year-round support role',     units: responses.filter(r=>Array.isArray(r.lifecycle_role)&&r.lifecycle_role.includes('year_round')).map(r=>r.unit), color:'#1565A0', bg:'#EEF4FB' },
+    { label:'Underused tools flagged',     units: responses.filter(r=>r.underused_tools?.trim()).map(r=>r.unit),                                               color:'#6A1B9A', bg:'#F8F4FF' },
+    { label:'Has magic wand request',      units: responses.filter(r=>r.magic_wand?.trim()).map(r=>r.unit),                                                    color:'#1A7A3C', bg:'#F0FAF4' },
+    { label:'Distrust a specific source',  units: responses.filter(r=>r.distrust_source?.trim()).map(r=>r.unit),                                               color:'#CC0033', bg:'#FFF0F2' },
+  ];
+
+  const avgConf = responses.filter(r=>r.confidence).length > 0
+    ? (responses.filter(r=>r.confidence).reduce((a,r)=>a+r.confidence,0) / responses.filter(r=>r.confidence).length)
+    : null;
+
+  return (
+    <div style={{marginTop:24}}>
+
+      {/* ── Section header ── */}
+      <div style={{fontSize:10,letterSpacing:2,fontWeight:600,color:'#CC0033',textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>
+        DIVISION ANALYTICS
+      </div>
+
+      {/* ── Row 1: Confidence bar chart + avg stat ── */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 200px',gap:12,marginBottom:12}}>
+        <div style={{background:'#fff',border:'1px solid #E8E3DD',borderRadius:2,padding:'20px 24px'}}>
+          <div style={{fontSize:11,fontWeight:600,color:'#666',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Data Confidence by Unit</div>
+          {confByUnit.map(({unit,score}) => (
+            <div key={unit} style={{marginBottom:10}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+                <span style={{fontSize:12,color:'#444',fontFamily:"'DM Sans',sans-serif",maxWidth:200,lineHeight:1.3}}>{unit}</span>
+                <span style={{fontSize:12,fontWeight:700,color:score?confColor(score):'#CCC',fontFamily:"'DM Sans',sans-serif",minWidth:40,textAlign:'right'}}>
+                  {score ?  : 'Pending'}
+                </span>
+              </div>
+              <div style={{background:'#F5F0EB',borderRadius:2,height:10,overflow:'hidden'}}>
+                <div style={{width:,height:'100%',background:score?confColor(score):'transparent',borderRadius:2,transition:'width .4s ease'}} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          <div style={{background:'#0D0D0D',borderRadius:2,padding:'20px 16px',flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center'}}>
+            <div style={{fontFamily:"'DM Serif Display',serif",fontSize:48,color:avgConf?confColor(Math.round(avgConf)):'#555',lineHeight:1}}>
+              {avgConf ? avgConf.toFixed(1) : '—'}
+            </div>
+            <div style={{fontSize:10,color:'#666',fontFamily:"'DM Sans',sans-serif",marginTop:8,letterSpacing:1,textTransform:'uppercase'}}>Avg Confidence</div>
+          </div>
+          <div style={{background:'#0D0D0D',borderRadius:2,padding:'16px',flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center'}}>
+            <div style={{fontFamily:"'DM Serif Display',serif",fontSize:48,color:'#CC0033',lineHeight:1}}>
+              {UNITS.filter(u=>!responses.find(r=>r.unit===u)).length}
+            </div>
+            <div style={{fontSize:10,color:'#666',fontFamily:"'DM Sans',sans-serif",marginTop:8,letterSpacing:1,textTransform:'uppercase'}}>Still Pending</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Row 2: Literacy + Lifecycle side by side ── */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+
+        {/* Literacy */}
+        <div style={{background:'#fff',border:'1px solid #E8E3DD',borderRadius:2,padding:'20px 24px'}}>
+          <div style={{fontSize:11,fontWeight:600,color:'#666',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Data Literacy Levels</div>
+          {litCounts.map(({level,units},i) => (
+            <div key={level} style={{marginBottom:12}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+                <div style={{background:litColors[i],color:'#fff',fontSize:10,fontWeight:700,borderRadius:2,padding:'2px 7px',fontFamily:"'DM Sans',sans-serif",flexShrink:0}}>L{level}</div>
+                <span style={{fontSize:11,color:'#888',fontFamily:"'DM Sans',sans-serif"}}>{litLabels[i]}</span>
+              </div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+                {units.length > 0
+                  ? units.map(u => <span key={u} style={{fontSize:11,background:litColors[i]+'22',color:litColors[i],border:,borderRadius:2,padding:'2px 8px',fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>{u}</span>)
+                  : <span style={{fontSize:11,color:'#CCC',fontFamily:"'DM Sans',sans-serif"}}>No responses yet</span>
+                }
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Lifecycle overlap */}
+        <div style={{background:'#F8F4FF',border:'1px solid #DDD0EE',borderRadius:2,padding:'20px 24px'}}>
+          <div style={{fontSize:11,fontWeight:600,color:'#6A1B9A',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Lifecycle Stage Overlap</div>
+          {lifecycleCounts.map(({val,label,units}) => (
+            <div key={val} style={{marginBottom:10}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3}}>
+                <span style={{fontSize:12,color:'#444',fontFamily:"'DM Sans',sans-serif"}}>{label}</span>
+                <span style={{fontSize:11,fontWeight:700,color:'#6A1B9A',fontFamily:"'DM Sans',sans-serif"}}>{units.length}/{responses.length}</span>
+              </div>
+              <div style={{background:'#E8D5F5',borderRadius:2,height:8,overflow:'hidden',marginBottom:3}}>
+                <div style={{width:responses.length>0?:'0%',height:'100%',background:'#6A1B9A',borderRadius:2,transition:'width .4s ease'}} />
+              </div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:3}}>
+                {units.map(u=><span key={u} style={{fontSize:10,color:'#6A1B9A',background:'#F3E5FF',border:'1px solid #DDD0EE',borderRadius:2,padding:'1px 6px',fontFamily:"'DM Sans',sans-serif"}}>{u}</span>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Row 3: Cross-unit signals ── */}
+      <div style={{background:'#0D0D0D',borderRadius:2,padding:'20px 24px',marginBottom:12}}>
+        <div style={{fontSize:11,fontWeight:600,color:'#666',letterSpacing:2,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Cross-Unit Signals</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}>
+          {signals.map((s,i) => (
+            <div key={i} style={{background:'#1A1A1A',borderRadius:2,padding:'14px 16px',borderLeft:}}>
+              <div style={{fontSize:10,color:'#888',fontFamily:"'DM Sans',sans-serif",marginBottom:8,lineHeight:1.4}}>{s.label}</div>
+              {s.units.length > 0
+                ? s.units.map(u=><div key={u} style={{fontSize:12,color:'#fff',fontWeight:600,fontFamily:"'DM Sans',sans-serif",marginBottom:2}}>{u}</div>)
+                : <div style={{fontSize:12,color:'#444',fontFamily:"'DM Sans',sans-serif"}}>None yet</div>
+              }
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Row 4: Priority signals — magic wand requests ── */}
+      {responses.some(r=>r.magic_wand?.trim()) && (
+        <div style={{background:'#fff',border:'1px solid #E8E3DD',borderRadius:2,padding:'20px 24px',marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:600,color:'#666',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Magic Wand Requests — What Directors Want Built</div>
+          {responses.filter(r=>r.magic_wand?.trim()).map((r,i)=>(
+            <div key={i} style={{borderLeft:'3px solid #1565A0',paddingLeft:12,marginBottom:14}}>
+              <div style={{fontSize:10,fontWeight:700,color:'#1565A0',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:4}}>{r.unit}</div>
+              <div style={{fontSize:13,color:'#333',fontFamily:"'DM Sans',sans-serif",lineHeight:1.6}}>{r.magic_wand}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Row 5: Blind spots ── */}
+      {responses.some(r=>r.blindspot?.trim()) && (
+        <div style={{background:'#fff',border:'1px solid #E8E3DD',borderRadius:2,padding:'20px 24px',marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:600,color:'#666',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Blind Spots & Data Gaps — What Directors Are Missing</div>
+          {responses.filter(r=>r.blindspot?.trim()).map((r,i)=>(
+            <div key={i} style={{borderLeft:'3px solid #CC0033',paddingLeft:12,marginBottom:14}}>
+              <div style={{fontSize:10,fontWeight:700,color:'#CC0033',letterSpacing:1,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:4}}>{r.unit}</div>
+              <div style={{fontSize:13,color:'#333',fontFamily:"'DM Sans',sans-serif",lineHeight:1.6}}>{r.blindspot}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+    </div>
+  );
+}
+
 // ─── ADMIN ───────────────────────────────────────────────────────────────────
 
 function AdminView({ onBack }) {
@@ -402,29 +581,7 @@ function AdminView({ onBack }) {
           ))}
         </div>
 
-        {responses.length >= 2 && (
-          <div className="themes-panel">
-            <div className="themes-title">Quick Signals Across All Responses</div>
-            <div className="themes-grid">
-              <div className="theme-card">
-                <div className="theme-label">Units citing low data trust (1–2)</div>
-                <div className="theme-val">{responses.filter(r=>r.confidence<=2).map(r=>r.unit).join(", ")||"None"}</div>
-              </div>
-              <div className="theme-card">
-                <div className="theme-label">Units at literacy level 1–2</div>
-                <div className="theme-val">{responses.filter(r=>["1","2"].includes(String(r.literacy_level))).map(r=>r.unit).join(", ")||"None"}</div>
-              </div>
-              <div className="theme-card">
-                <div className="theme-label">Units seeing themselves as year-round or ongoing support</div>
-                <div className="theme-val">{responses.filter(r=>Array.isArray(r.lifecycle_role) && r.lifecycle_role.includes("year_round")).map(r=>r.unit).join(", ")||"None yet"}</div>
-              </div>
-              <div className="theme-card">
-                <div className="theme-label">Units with underused tools flagged</div>
-                <div className="theme-val">{responses.filter(r=>r.underused_tools?.trim()).map(r=>r.unit).join(", ")||"None"}</div>
-              </div>
-            </div>
-          </div>
-        )}
+        {responses.length >= 1 && <AnalyticsDashboard responses={responses} />}
       </div>
     </div>
   );
