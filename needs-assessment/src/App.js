@@ -249,7 +249,7 @@ function FormView({ onSubmitSuccess }) {
         {error && <div className="error-bar">{error}</div>}
 
         <div className="submit-row">
-          <p className="submit-note">Your response is shared only with the Associate Director of Analytics and used only to prepare for your scheduled conversation.</p>
+          <p className="submit-note">Your response is shared only with the Director of Data Analytics and used only to prepare for your scheduled conversation.</p>
           <button className="btn-submit" onClick={handleSubmit} disabled={submitting}>
             {submitting ? "Submitting…" : "Submit My Responses →"}
           </button>
