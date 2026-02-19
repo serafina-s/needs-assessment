@@ -382,7 +382,7 @@ function AnalyticsDashboard({ responses }) {
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
                 {units.length > 0
-                  ? units.map(u => <span key={u} style={{fontSize:11,background:litColors[i]+'22',color:litColors[i],border:,borderRadius:2,padding:'2px 8px',fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>{u}</span>)
+                  ? units.map(u => <span key={u} style={{fontSize:11,background:litColors[i]+'22',color:litColors[i],border:'1px solid '+litColors[i],borderRadius:2,padding:'2px 8px',fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>{u}</span>)
                   : <span style={{fontSize:11,color:'#CCC',fontFamily:"'DM Sans',sans-serif"}}>No responses yet</span>
                 }
               </div>
