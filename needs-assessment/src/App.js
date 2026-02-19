@@ -343,11 +343,11 @@ function AnalyticsDashboard({ responses }) {
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
                 <span style={{fontSize:12,color:'#444',fontFamily:"'DM Sans',sans-serif",maxWidth:200,lineHeight:1.3}}>{unit}</span>
                 <span style={{fontSize:12,fontWeight:700,color:score?confColor(score):'#CCC',fontFamily:"'DM Sans',sans-serif",minWidth:40,textAlign:'right'}}>
-                  {score ?  : 'Pending'}
+                  {score ? score + '/5' : 'Pending'}
                 </span>
               </div>
               <div style={{background:'#F5F0EB',borderRadius:2,height:10,overflow:'hidden'}}>
-                <div style={{width:,height:'100%',background:score?confColor(score):'transparent',borderRadius:2,transition:'width .4s ease'}} />
+                <div style={{width:score?(score/5)*100+'%':'0%',height:'100%',background:score?confColor(score):'transparent',borderRadius:2,transition:'width .4s ease'}} />
               </div>
             </div>
           ))}
@@ -400,7 +400,7 @@ function AnalyticsDashboard({ responses }) {
                 <span style={{fontSize:11,fontWeight:700,color:'#6A1B9A',fontFamily:"'DM Sans',sans-serif"}}>{units.length}/{responses.length}</span>
               </div>
               <div style={{background:'#E8D5F5',borderRadius:2,height:8,overflow:'hidden',marginBottom:3}}>
-                <div style={{width:responses.length>0?:'0%',height:'100%',background:'#6A1B9A',borderRadius:2,transition:'width .4s ease'}} />
+                <div style={{width:responses.length>0?(units.length/responses.length)*100+'%':'0%',height:'100%',background:'#6A1B9A',borderRadius:2,transition:'width .4s ease'}} />
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:3}}>
                 {units.map(u=><span key={u} style={{fontSize:10,color:'#6A1B9A',background:'#F3E5FF',border:'1px solid #DDD0EE',borderRadius:2,padding:'1px 6px',fontFamily:"'DM Sans',sans-serif"}}>{u}</span>)}
