@@ -436,19 +436,20 @@ export default function App() {
   const [view, setView] = useState("form");
   const [dName, setDName] = useState("");
   const [dUnit, setDUnit] = useState("");
-  const [headerClicks, setHeaderClicks] = useState(0);
 
   useEffect(() => {
-    if (headerClicks >= 3) { setView("admin"); setHeaderClicks(0); }
-  }, [headerClicks]);
+    const handleKey = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "A") {
+        setView(v => v === "admin" ? "form" : "admin");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
 
   if (view === "admin") return <AdminView onBack={() => setView("form")} />;
   if (view === "thankyou") return <ThankYouView name={dName} unit={dUnit} />;
-  return (
-    <div onClick={() => { if (view === "form") setHeaderClicks(c => c + 1); }}>
-      <FormView onSubmitSuccess={(n,u) => { setDName(n); setDUnit(u); setView("thankyou"); }} />
-    </div>
-  );
+  return <FormView onSubmitSuccess={(n,u) => { setDName(n); setDUnit(u); setView("thankyou"); }} />;
 }
 
 // ─── STYLES ──────────────────────────────────────────────────────────────────
