@@ -415,7 +415,7 @@ function AnalyticsDashboard({ responses }) {
         <div style={{fontSize:11,fontWeight:600,color:'#666',letterSpacing:2,textTransform:'uppercase',fontFamily:"'DM Sans',sans-serif",marginBottom:16}}>Cross-Unit Signals</div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}>
           {signals.map((s,i) => (
-            <div key={i} style={{background:'#1A1A1A',borderRadius:2,padding:'14px 16px',borderLeft:}}>
+            <div key={i} style={{background:'#1A1A1A',borderRadius:2,padding:'14px 16px',borderLeft:'3px solid '+s.color}}>
               <div style={{fontSize:10,color:'#888',fontFamily:"'DM Sans',sans-serif",marginBottom:8,lineHeight:1.4}}>{s.label}</div>
               {s.units.length > 0
                 ? s.units.map(u=><div key={u} style={{fontSize:12,color:'#fff',fontWeight:600,fontFamily:"'DM Sans',sans-serif",marginBottom:2}}>{u}</div>)
